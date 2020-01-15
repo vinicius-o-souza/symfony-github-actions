@@ -32,6 +32,10 @@ services:
     # App\Service\Greeting:
     #     arguments:
     #         $message: '%hello_message%'
+    
+    App\Twig\AppExtension:
+        arguments:
+            $locale: '%locale%'
         
 
     # add more service definitions when explicit configuration is needed
