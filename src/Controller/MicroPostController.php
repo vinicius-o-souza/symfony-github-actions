@@ -6,6 +6,7 @@ use App\Entity\MicroPost;
 use App\Entity\User;
 use App\Form\MicroPostType;
 use App\Repository\MicroPostRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -81,10 +82,27 @@ class MicroPostController extends AbstractController
     /**
      * @Route("/", name="micro_post_index")
      */
-    public function index()
+    public function index(TokenStorageInterface $tokenStorage, UserRepository $userRepository)
     {
+        $currentUser = $tokenStorage->getToken()->getUser();
+        $usersToFollow = [];
+        
+        if ($currentUser instanceof User) {
+            $following = $currentUser->getFollowing();
+            $posts = $this->microPostRepository->findAllByUsers($following);
+            
+            $usersToFollow = count($posts) === 0 ?
+                $userRepository->findAllWithMoreThan5PostsExceptUser($currentUser) : [];
+        } else {
+            $posts = $this->microPostRepository->findBy(
+                [], 
+                ['time' => 'DESC']
+            );
+        }
+        
         $html = $this->twig->render('micro-post/index.html.twig', [
-            'posts' => $this->microPostRepository->findBy([], ['time' => 'DESC'])
+            'posts' => $posts,
+            'usersToFollow' => $usersToFollow
         ]);
         
         return new Response($html);
@@ -96,13 +114,13 @@ class MicroPostController extends AbstractController
      */
     public function edit(MicroPost $microPost, Request $request)
     {
-        if ($this->denyAccessUnlessGranted('edit', $microPost)) {
+        // if ($this->denyAccessUnlessGranted('edit', $microPost)) {
+        //     throw new UnauthorizedHttpException('erro');
+        // }
+        
+        if (!$this->authorizationChecker->isGranted('edit', $microPost)) {
             throw new UnauthorizedHttpException('erro');
         }
-        
-        // if (!$this->authorizationChecker->isGranted('edit', $microPost)) {
-        //     throw new UnauthorizedHttpException();
-        // }
         $form = $this->formFactory->create(MicroPostType::class, $microPost);
         $form->handleRequest($request);
         
@@ -168,6 +186,23 @@ class MicroPostController extends AbstractController
         return new RedirectResponse(
             $this->router->generate('micro_post_index')
         );
+    }
+    
+    /**
+     * @Route("/user/{username}", name="micro_post_user")
+     */
+    public function userPosts(User $userWithPosts)
+    {
+        $html = $this->twig->render('micro-post/user-posts.html.twig', [
+            'posts' => $this->microPostRepository->findBy(
+                ['user' => $userWithPosts], 
+                ['time' => 'DESC']
+            ),
+            // 'posts' => $userWithPosts->getPosts(),
+            'user' => $userWithPosts,
+        ]);
+        
+        return new Response($html);
     }
     
     /**

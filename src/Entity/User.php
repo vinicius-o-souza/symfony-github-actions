@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -69,12 +70,12 @@ class User implements UserInterface, \Serializable
     private $posts;
     
     /**
-     * @ORM\ManyToMany(targeEntity="App\Entity\User", mappedBy="following")
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="following")
      */
     private $followers;
     
     /**
-     * @ORM\ManyToMany(targeEntity="App\Entity\User", inversedBy="followers")
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="followers")
      * @ORM\JoinTable(name="following",
      *      joinColumns={
      *          @ORM\JoinColumn(name="user_id", referencedColumnName="id")
@@ -192,5 +193,29 @@ class User implements UserInterface, \Serializable
     public function getPosts()
     {
         return $this->posts;
+    }
+    
+    /**
+     * @return Collection
+     */
+    public function getFollowers()
+    {
+        return $this->followers;
+    }
+    
+    /**
+     * @return Collection
+     */
+    public function getFollowing()
+    {
+        return $this->following;
+    }
+    
+    public function follow(User $userToFollow)
+    {
+        if ($this->getFollowing()->contains($userToFollow)) {
+            return;
+        }
+        $this->getFollowing()->add($userToFollow);
     }
 }
