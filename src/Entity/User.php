@@ -92,12 +92,24 @@ class User implements UserInterface, \Serializable
      */
     private $following;
     
+    /**
+     * @ORM\Column(type="string", nullable=true, length=30)
+     */
+    private $confirmationToken;
+    
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $enabled;
+    
     public function __construct()
     {
         $this->posts = new ArrayCollection();
         $this->followers = new ArrayCollection();
         $this->following = new ArrayCollection();
         $this->postsLiked = new ArrayCollection();
+        $this->roles = [self::ROLE_USER];
+        $this->enabled = false;
     }
     
     public function getRoles()
@@ -138,7 +150,8 @@ class User implements UserInterface, \Serializable
         return serialize([
             $this->id,
             $this->username,
-            $this->password
+            $this->password,
+            $this->enabled
         ]);
     }
     
@@ -147,7 +160,9 @@ class User implements UserInterface, \Serializable
         list(
             $this->id,
             $this->username,
-            $this->password)  = unserialize($serialized);
+            $this->password,
+            $this->enabled)  = unserialize($serialized);
+            
     }
 
     public function getId()
@@ -233,6 +248,43 @@ class User implements UserInterface, \Serializable
     public function getPostsLiked()
     {
         return $this->postsLiked;
+    }
+    
+    /**
+     * @return mixed
+     */
+    public function getConfirmationToken()
+    {
+        return $this->confirmationToken;
+    }
+    
+    /**
+     * @param mixed $confirmationToken
+     */
+    public function setConfirmationToken($confirmationToken)
+    {
+        $this->confirmationToken = $confirmationToken;
+    }
+    
+    /**
+     * @return mixed
+     */
+    public function getEnabled()
+    {
+        return $this->enabled;
+    }
+    
+    /**
+     * @param mixed $enabled
+     */
+    public function setEnabled($enabled)
+    {
+        $this->enabled = $enabled;
+    }
+    
+    public function isEnabled()
+    {
+        return $this->enabled;
     }
 
 }
