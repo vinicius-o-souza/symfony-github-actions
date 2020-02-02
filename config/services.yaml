@@ -53,3 +53,16 @@ services:
     App\EventListener\LikeNotificationSubscriber:
         tags:
             - { name: doctrine.event_subscriber, connection: default }
+            
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
+        arguments:
+            - !service { class: PDO, factory: ['@database_connection', 'getWrappedConnection'] }
+            - { lock_mode: 1 }
+            
+    App\EventSubscriber\UserSubscriber:
+        arguments:
+            $defaultLocale: '%kernel.default_locale%'
+            
+    App\EventSubscriber\LocaleSubscriber:
+        arguments:
+            - '%kernel.default_locale%'

@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Event\UserRegisterEvent;
-use App\Event\UserSubscriber;
 use App\Form\UserType;
 use App\Security\TokenGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,8 +43,6 @@ class RegisterController extends AbstractController
             $entityManager->flush();
             
             $userRegisterEvent = new UserRegisterEvent($user);
-            // $subscriber = new UserSubscriber($mailer);
-            // $eventDispatcher->addSubscriber($subscriber);
             $eventDispatcher->dispatch($userRegisterEvent);
             
             return $this->redirectToRoute('micro_post_index');

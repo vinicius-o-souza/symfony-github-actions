@@ -102,6 +102,11 @@ class User implements UserInterface, \Serializable
      */
     private $enabled;
     
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\UserPreferences")
+     */
+    private $preferences;
+    
     public function __construct()
     {
         $this->posts = new ArrayCollection();
@@ -287,4 +292,20 @@ class User implements UserInterface, \Serializable
         return $this->enabled;
     }
 
+
+    /**
+     * @return mixed
+     */ 
+    public function getPreferences()
+    {
+        return $this->preferences;
+    }
+
+    /**
+     * @param mixed $preferences
+     */ 
+    public function setPreferences($preferences)
+    {
+        $this->preferences = $preferences;
+    }
 }
