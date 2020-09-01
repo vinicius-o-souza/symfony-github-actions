@@ -1,5 +1,6 @@
 {
     "name": "vinicius/symfony",
+    "description": "Testando Github Actions",
     "type": "project",
     "license": "proprietary",
     "require": {
