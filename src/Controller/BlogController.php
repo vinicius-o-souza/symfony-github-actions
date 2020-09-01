@@ -31,6 +31,7 @@ class BlogController extends AbstractController
      */
     public function index(Request $request)
     {
+        $var = []
         return $this->render('base.html.twig', ['message' => $this->greeting->greet(
             $request->get('name')
         )]);
