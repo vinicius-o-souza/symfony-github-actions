@@ -1,4 +1,5 @@
 {
+    "name": "Symfony Project",
     "type": "project",
     "license": "proprietary",
     "require": {
