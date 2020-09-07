@@ -17,8 +17,5 @@ jobs:
     - name: Validate composer.json and composer.lock
       run: composer validate
 
-    - name: Run test suite
-      run: composer run-script test
-
     - name: Run PHPSTAN
       run: composer run-script phpstan
