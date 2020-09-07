@@ -14,9 +14,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Build the Stack
-      run: docker-compose up -d app db
-
     - name: Validate composer.json and composer.lock
       run: composer validate
 
