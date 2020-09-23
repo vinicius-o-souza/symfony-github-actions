@@ -1,0 +1,43 @@
+version: "3.7"
+services:
+  db:
+    image: mariadb
+    container_name: db
+    ports:
+      - "3308:3306"
+    networks:
+      - network
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/initdb:/docker-entrypoint-initdb.d
+      - ./db/my.cnf:/etc/mysql/my.cnf
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=vuc
+      - MYSQL_USER=vuc
+      - MYSQL_PASSWORD=vuc
+    
+  app:
+    build: ./app/
+    image: app
+    container_name: app
+    ports:
+      - "8082:80"
+    volumes:
+      - ./app/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf
+      - ./app/app:/var/www/html/
+      - ./app/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+    networks:
+      - network
+
+  composer:
+    image: composer
+    command: ["composer", "install"]
+    volumes:
+      - ./app/app:/app
+    networks:
+      - network
+
+networks:
+  network:
+    name: network
